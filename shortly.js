@@ -23,6 +23,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
 
+var checkUser = function(){
+
+}
 
 app.get('/', 
 function(req, res) {
@@ -33,7 +36,11 @@ app.get('/login',
   function(req, res){
     res.render('login');
   })
-
+app.get('/logout',
+  function(req, res){
+    alert("You've been logged out");
+    res.render('login');
+  })
 app.get('/create', 
 function(req, res) {
   res.render('index');
@@ -72,11 +79,12 @@ function(req, res) {
           console.log('Error reading URL heading: ', err);
           return res.send(404);
         }
-        console.log('What is at do title be?', title);
+        // console.log('What is at do title be?', title);
         var link = new Link({
           url: uri,
           title: title,
-          base_url: req.headers.origin
+          base_url: req.headers.origin,
+          // user_id : user.get('id')
         });
 
         link.save().then(function(newLink) {
@@ -120,8 +128,6 @@ function(req, res) {
   }).fetch().then( function(found){
     if (found){
       //initialize session here
-
-
     app.use(session({
     // When there is nothing on the session, do not save it
     saveUninitialized: false,
@@ -135,6 +141,7 @@ function(req, res) {
         httpOnly: false,
         // Domain of the cookie
         domain: 'http://localhost:3001',
+       
         expires: false,
         // Maximum age of the cookie
         maxAge: 1000*60*60*24*7,
@@ -146,11 +153,9 @@ function(req, res) {
     // Store the cookie in db
     })); 
 
-
-
-
       res.render('index');
     } else {
+      alert("Wrong password");
       res.render('login');
     }
   })
@@ -163,6 +168,7 @@ function(req, res) {
 /************************************************************/
 
 app.get('/*', function(req, res) {
+
   new Link({ code: req.params[0] }).fetch().then(function(link) {
     if (!link) {
       res.redirect('/');

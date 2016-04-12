@@ -141,10 +141,10 @@ describe('', function() {
         });
       });
 
-      xit('Fetches the link url title', function (done) {
+      it('Fetches the link url title', function (done) {
         requestWithSession(options, function(error, res, body) {
           db.knex('urls')
-            .where('title', '=', 'GitHub · Where software is built')
+            .where('title', '=', 'How people build software · GitHub')
             .then(function(urls) {
               if (urls['0'] && urls['0']['title']) {
                 var foundTitle = urls['0']['title'];
