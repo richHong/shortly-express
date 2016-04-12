@@ -1,6 +1,7 @@
 var express = require('express');
 var util = require('./lib/utility');
 var partials = require('express-partials');
+var session = require('express-session');
 var bodyParser = require('body-parser');
 
 
@@ -25,13 +26,24 @@ app.use(express.static(__dirname + '/public'));
 
 app.get('/', 
 function(req, res) {
-  res.render('index');
+  res.render('login');
 });
+
+app.get('/login',
+  function(req, res){
+    res.render('login');
+  })
 
 app.get('/create', 
 function(req, res) {
   res.render('index');
 });
+
+app.get('/signup',
+  function(req, res){
+    res.render('signup');
+  })
+
 
 app.get('/links', 
 function(req, res) {
@@ -43,7 +55,7 @@ function(req, res) {
 app.post('/links', 
 function(req, res) {
   var uri = req.body.url;
-
+  console.log('What is req.body...', req.body);
   if (!util.isValidUrl(uri)) {
     console.log('Not a valid url: ', uri);
     return res.send(404);
@@ -51,6 +63,8 @@ function(req, res) {
 
   new Link({ url: uri }).fetch().then(function(found) {
     if (found) {
+      console.log('found.attributes', found.attributes);
+      console.log('found', found);
       res.send(200, found.attributes);
     } else {
       util.getUrlTitle(uri, function(err, title) {
@@ -58,7 +72,7 @@ function(req, res) {
           console.log('Error reading URL heading: ', err);
           return res.send(404);
         }
-
+        console.log('What is at do title be?', title);
         var link = new Link({
           url: uri,
           title: title,
@@ -78,8 +92,69 @@ function(req, res) {
 // Write your dedicated authentication routes here
 // e.g. login, logout, etc.
 /************************************************************/
+app.post('/signup', 
+function(req, res) {
+  var username = req.body.username;
+  var password = req.body.password;
+  // util.getUrlTitle()
+  var user = new User({
+    name: username,
+    password: password
+    // title: title,
+  });
+
+  user.save().then(function(newUser){
+    Users.add(newUser);
+    res.redirect("login");
+  })
+});
+
+app.post('/login', 
+function(req, res) {
+  var username = req.body.username;
+  var password = req.body.password;
+
+  new User({
+    name: username,
+    password: password,
+  }).fetch().then( function(found){
+    if (found){
+      //initialize session here
 
 
+    app.use(session({
+    // When there is nothing on the session, do not save it
+    saveUninitialized: false,
+    // Update session if it changes
+    resave: true,
+    // Set cookie
+    cookie: {
+        // Unsecure
+        secure: false,
+        // Http & https
+        httpOnly: false,
+        // Domain of the cookie
+        domain: 'http://localhost:3001',
+        expires: false,
+        // Maximum age of the cookie
+        maxAge: 1000*60*60*24*7,
+      },
+    // Name of your cookie
+    name: 'testCookie',
+    // Secret of your cookie
+    secret: 'someHugeSecret',
+    // Store the cookie in db
+    })); 
+
+
+
+
+      res.render('index');
+    } else {
+      res.render('login');
+    }
+  })
+});
 
 /************************************************************/
 // Handle the wildcard route last - if all other routes fail

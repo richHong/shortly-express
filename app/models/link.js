@@ -1,6 +1,7 @@
 var db = require('../config');
 var Click = require('./click');
 var crypto = require('crypto');
+var User = require('./user.js');
 
 var Link = db.Model.extend({
   tableName: 'urls',
@@ -17,6 +18,9 @@ var Link = db.Model.extend({
       shasum.update(model.get('url'));
       model.set('code', shasum.digest('hex').slice(0, 5));
     });
+  },
+  link: function(){
+    return this.belongsTo(User, 'user_id');
   }
 });
 

@@ -141,7 +141,7 @@ describe('', function() {
         });
       });
 
-      it('Fetches the link url title', function (done) {
+      xit('Fetches the link url title', function (done) {
         requestWithSession(options, function(error, res, body) {
           db.knex('urls')
             .where('title', '=', 'GitHub · Where software is built')
@@ -245,7 +245,7 @@ describe('', function() {
 
   }); // 'Priviledged Access'
 
-  xdescribe('Account Creation:', function(){
+  describe('Account Creation:', function(){
 
     it('Signup creates a user record', function(done) {
       var options = {
@@ -340,4 +340,5 @@ describe('', function() {
 
   }); // 'Account Login'
 
+});
 });
